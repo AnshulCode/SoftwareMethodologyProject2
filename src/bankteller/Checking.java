@@ -1,35 +1,47 @@
 package bankteller;
 
-import java.math.RoundingMode;
+
 import java.text.DecimalFormat;
 
-public class Checking extends Account{
+/**
+ * The type Checking.
+ */
+public class Checking extends Account {
     private double fee = 25;
-    private double rate = .001/12;
+    private double rate = .001 / 12;
     private final String TYPE = "Checking";
 
-    public Checking(Profile holder , double balance){
+    /**
+     * Instantiates a new Checking.
+     *
+     * @param holder  the holder
+     * @param balance the balance
+     */
+    public Checking(Profile holder, double balance) {
         super.holder = holder;
         super.balance = balance;
     }
 
     @Override
     public boolean isSufficentFunds(double amount) {
-        if(super.balance-this.fee-amount <= 0){
+        if (super.balance - this.fee - amount <= 0) {
             return false;
         }
         return true;
     }
+
     @Override
-    public void setStatus(boolean toClose){
-        super.setStatus(toClose);
+    public void close() {
+        super.close();
     }
+
     @Override
     public double fee() {
-        if(super.balance >= 1000){
+        if (super.balance >= 1000) {
             this.fee = 0;
             return this.fee;
         }
+        this.fee = 25;
         return this.fee;
     }
 
@@ -46,15 +58,15 @@ public class Checking extends Account{
     @Override
     public String printFormat() {
         DecimalFormat deciFormat = new DecimalFormat("###,###,###.##");
-        deciFormat.setRoundingMode(RoundingMode.CEILING);
+
         deciFormat.setMaximumFractionDigits(2);
         deciFormat.setMinimumFractionDigits(2);
 
-        String rateRounded = deciFormat.format(super.balance);
-        if(super.closed){
-            return this.TYPE+"::"+super.holder.toString()+":: Balance $"+rateRounded+"::CLOSED::";
+        String rateRounded = deciFormat.format(super.rounder(super.balance));
+        if (super.closed) {
+            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded + "::CLOSED::";
         }
-        return this.TYPE+"::"+super.holder.toString()+":: Balance $"+rateRounded;
+        return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded;
     }
 
     @Override
@@ -70,22 +82,32 @@ public class Checking extends Account{
     @Override
     public String interestPreview() {
         DecimalFormat decimalFormat = new DecimalFormat("#,###,###,###.##");
-        decimalFormat.setRoundingMode(RoundingMode.CEILING);
+
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
         String acct = this.toString();
-        return acct+"::fee $"+decimalFormat.format(this.fee())+"::monthly interest $"+this.monthlyInterest();
+        return acct + "::fee $" + decimalFormat.format(this.fee()) + "::monthly interest $"
+                + decimalFormat.format(this.monthlyInterest());
     }
 
     @Override
-    public void setMonthlyInterest(){
+    public void setMonthlyInterest() {
+        if (super.isClosed()) {
+            return;
+        }
         super.balance -= this.fee();
         super.balance += this.monthlyInterest();
+        super.balance = super.rounder(super.balance);
     }
 
 
     @Override
     public double monthlyInterest() {
-        return this.balance*this.rate;
+        if (super.isClosed()) {
+            return 0.00;
+        }
+
+        double monthlyInterest = this.balance * this.rate;
+        return super.rounder(monthlyInterest);
     }
 }

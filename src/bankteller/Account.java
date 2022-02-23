@@ -3,66 +3,171 @@ package bankteller;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+/**
+ * The type Account.
+ */
 public abstract class Account {
 
-        protected Profile holder;
-        protected boolean closed;
-        protected double balance;
+    /**
+     * The Holder.
+     */
+    protected Profile holder;
+    /**
+     * The Closed.
+     */
+    protected boolean closed;
+    /**
+     * The Balance.
+     */
+    protected double balance;
 
-        public double getBalance() {
-            return this.balance;
+    /**
+     * Gets balance.
+     *
+     * @return the balance
+     */
+    public double getBalance() {
+        return this.balance;
+    }
+
+    /**
+     * Rounder double.
+     *
+     * @param number the number
+     * @return the double
+     */
+    public double rounder(double number) {
+
+        double monthlyInterest = number;
+
+        double placeholder = monthlyInterest;
+
+        double toHund = placeholder * 100.0;
+        double toPointFive = toHund + 0.5;
+        int reuslts = (int) toPointFive;
+
+        double interest = reuslts / 100.0;
+        return interest;
+    }
+
+
+    /**
+     * Close.
+     */
+    public void close() {
+        this.balance = 0.00;
+        this.closed = true;
+    }
+
+    /**
+     * Is closed boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isClosed() {
+        return closed;
+    }
+
+    /**
+     * Gets holder.
+     *
+     * @return the holder
+     */
+    public Profile getHolder() {
+        return this.holder;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Account compare = (Account) obj;
+
+        if (!compare.getType().equals(this.getType())) {
+            return false;
+        }
+        if (!this.holder.equals(compare.getHolder())) {
+            return false;
         }
 
+        return true;
+    }
 
-        public void setStatus(boolean toClose){
-                if(this.closed == toClose){
-                        return;
-                }
-                this.closed = toClose;
+    @Override
+    public String toString() {
+        return this.printFormat();
+    }
+
+    /**
+     * Withdraw.
+     *
+     * @param amount the amount
+     */
+    public void withdraw(double amount) {
+        if (this.balance - amount <= 0) {
+            return;
         }
+        this.balance -= amount;
+        this.balance = this.rounder(this.balance);
+    }
 
-
-
-        public Profile getHolder() {
-                return this.holder;
+    /**
+     * Deposit.
+     *
+     * @param amount the amount
+     */
+    public void deposit(double amount) {
+        if (amount < 0) {
+            return;
         }
-        @Override
-        public boolean equals(Object obj) {
-                Account compare = (Account)obj;
+        this.balance += amount;
+        this.balance = this.rounder(this.balance);
+    }
 
-                if(!compare.getType().equals(this.getType())){
-                        return false;
-                }
-                if(!this.holder.equals(compare.getHolder())){
-                        return false;
-                }
+    /**
+     * Interest preview string.
+     *
+     * @return the string
+     */
+    public abstract String interestPreview();
 
-                return true;
-        }
-        @Override
-        public String toString() {
-                return this.printFormat();
-        }
+    /**
+     * Is sufficent funds boolean.
+     *
+     * @param amount the amount
+     * @return the boolean
+     */
+    public abstract boolean isSufficentFunds(double amount);
 
-        public void withdraw(double amount) {
-                if(this.balance - amount <= 0){
-                        return;
-                }
-                this.balance -= amount;
-        }
+    /**
+     * Sets monthly interest.
+     */
+    public abstract void setMonthlyInterest();
 
-        public void deposit(double amount) {
-                if(amount<0){
-                        return;
-                }
-                this.balance += amount;
-        }
-        public abstract String interestPreview();
-        public abstract boolean isSufficentFunds(double amount);
-        public abstract void setMonthlyInterest();
-        public abstract String  printFormat();
-        public abstract double monthlyInterest(); //return the monthly interest
-        public abstract double fee(); //return the monthly fee
-        public abstract String getType(); //return the account type (class name)
+    /**
+     * Print format string.
+     *
+     * @return the string
+     */
+    public abstract String printFormat();
+
+    /**
+     * Monthly interest double.
+     *
+     * @return the double
+     */
+    public abstract double monthlyInterest(); //return the monthly interest
+
+    /**
+     * Fee double.
+     *
+     * @return the double
+     */
+    public abstract double fee(); //return the monthly fee
+
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
+    public abstract String getType(); //return the account type (class name)
 
 }
