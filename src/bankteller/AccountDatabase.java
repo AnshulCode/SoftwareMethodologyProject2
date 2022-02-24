@@ -15,6 +15,11 @@ public class AccountDatabase {
         this.numAcct = 0;
     }
 
+    /**
+     * Finds account in the Account Database
+     * @param account , which account you want to find
+     * @return -1 if not found, index in Database if found
+     */
     private int find(Account account) {
         for (int i = 0; i < this.accounts.length; i++) {
             if (this.accounts[i] != null) {
@@ -27,15 +32,25 @@ public class AccountDatabase {
     }
 
     /**
-     * Public find int.
+     * Since the orginal is private and we need to access this
+     * in the bank teller,
+     * It is better to have a public find
      *
-     * @param account the account
-     * @return the int
+     * @param account the account that we found
+     * @return the account we need to find, null if not found
      */
-    public int publicFind(Account account) {
-        return this.find(account);
+    public Account publicFind(Account account) {
+        if(this.find(account) == -1){
+            return null;
+
+        }
+        int index = this.find(account);
+        return this.accounts[index];
     }
 
+    /**
+     * resizes the array every time it is full by 4
+     */
     private void grow() {
         if (this.numAcct == this.accounts.length) {
             Account[] newAccounts = new Account[this.accounts.length + 4];
@@ -55,7 +70,10 @@ public class AccountDatabase {
     public boolean open(Account account) {
 
         if (this.find(account) != -1) {
-
+            if(accounts[this.find(account)].isClosed()){
+                accounts[this.find(account)].open(account.getBalance());
+                return true;
+            }
             return false;
         }
         this.grow();
@@ -81,7 +99,8 @@ public class AccountDatabase {
     /**
      * Deposit.
      *
-     * @param account the account
+     * @param account the account you want to deposit from
+     * Does nothing if there is no account found or if the account is closed
      */
     public void deposit(Account account) {
         if (this.find(account) == -1) {
@@ -94,10 +113,10 @@ public class AccountDatabase {
     }
 
     /**
-     * Withdraw boolean.
+     * Withdraw money from account
      *
      * @param account the account
-     * @return the boolean
+     * @return True is there is sufficient funds and is not closed, false otherwise
      */
     public boolean withdraw(Account account) {
         if (this.find(account) == -1) {
@@ -112,11 +131,11 @@ public class AccountDatabase {
         this.accounts[this.find(account)].withdraw(account.getBalance());
 
         return true;
-    } //return false if insufficient fund
+    }
 
 
     /**
-     * Print.
+     * Print All Accounts in the Database.
      */
     public void print() {
 
@@ -131,7 +150,7 @@ public class AccountDatabase {
 
 
     /**
-     * Sort by account type.
+     * Sort all accounts in the Database by account type.
      */
     public void sortByAccountType() {
         for (int i = 0; i < this.numAcct; i++) {
@@ -152,7 +171,7 @@ public class AccountDatabase {
 
 
     /**
-     * Print by account type.
+     * Print all accounts by account type.
      */
     public void printByAccountType() {
         System.out.println("*list of accounts by account type.");
@@ -163,7 +182,7 @@ public class AccountDatabase {
     }
 
     /**
-     * Print fee and interest.
+     * Print potential fee and interest if updated.
      */
     public void printFeeAndInterest() {
         System.out.println("*list of accounts with fee and monthly interest");

@@ -29,9 +29,10 @@ public class main {
         test.open(account4);
         Account deposit = new MoneyMarketAccount(holder, 39990);
         Account withdraw = new Checking(holder3, 781);
-        test.deposit(deposit);
+        test.close(deposit);
+        test.open(deposit);
 
-        test.withdraw(withdraw);
+
 
         test.printFeeAndInterest();
 

@@ -21,6 +21,15 @@ public abstract class Account {
      */
     protected double balance;
 
+    public void open(double amount){
+        if(closed) {
+
+            this.balance = 0.0;
+            this.balance = this.rounder(amount);
+            closed = false;
+        }
+    }
+
     /**
      * Gets balance.
      *
@@ -135,7 +144,12 @@ public abstract class Account {
      * @param amount the amount
      * @return the boolean
      */
-    public abstract boolean isSufficentFunds(double amount);
+    public boolean isSufficentFunds(double amount){
+        if (this.balance - this.fee() - amount <= 0) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Sets monthly interest.

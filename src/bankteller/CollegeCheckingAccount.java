@@ -34,30 +34,65 @@ public class CollegeCheckingAccount extends Account {
 
     }
 
+    /**
+     *
+     */
+    @Override
+    public void close(){
+        super.close();
+    }
+
+    /**
+     *Gets fee for account
+     * @return the fee for a College checking Account
+     */
 
     @Override
     public double fee() {
         return 0;
     }
-
+    /**
+     * returns the class type for a College checking Account
+     * @return
+     */
     @Override
     public String getType() {
         return TYPE;
     }
 
+
+
+    @Override
+    public void open(double amount) {
+        super.open(amount);
+    }
+    /**
+     * turns the CollageCheckingAccount into readable string format
+     * Implemented from Accounts class
+     * @return CollageCheckingAccount in string format
+     */
     @Override
     public String toString() {
         return super.toString();
     }
 
+    /**
+     * Check if there is enoguht for a withdrawl
+     * Implemented from Account class
+     * @param amount amount to check if there is enough  for a withdraw
+     * @return True if there is, false otherwise
+     */
     @Override
     public boolean isSufficentFunds(double amount) {
-        if (super.balance - amount <= 0) {
-            return false;
-        }
-        return true;
+        return super.isSufficentFunds(amount);
     }
 
+    /**
+     * Gives the format for toString to print
+     * Implemented from Accounts class
+     * This is needed to get the right input for the toString method
+     * @return the CollageCheckingAccount in string format
+     */
     @Override
     public String printFormat() {
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###.##");
@@ -87,22 +122,41 @@ public class CollegeCheckingAccount extends Account {
 
     }
 
+    /**
+     *Invokes the Account method's deposit function
+     * @param amount the amount to deposit
+     */
+
     @Override
     public void deposit(double amount) {
         super.deposit(amount);
     }
 
+    /**
+     * Invokes the Account method's equals function
+     * @param obj object to comapre
+     * @return True if equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
+    /**
+     * Invokes the Account method's withdraw function
+     * @param amount the amount to withdraw
+     */
     @Override
     public void withdraw(double amount) {
         super.withdraw(amount);
     }
 
-
+    /**
+     * implementation of abstract method in Account with
+     * same name
+     * gets the monthly interest
+     * @return the monthly intrest
+     */
     @Override
     public double monthlyInterest() {
 
@@ -113,6 +167,13 @@ public class CollegeCheckingAccount extends Account {
         return super.rounder(monthlyInterest);
     }
 
+    /**
+     * implementation of abstract method in Account
+     * with same name
+     * This is mainly used in the printFeeAndInterest method in
+     * AccountDatabase
+     * @return the String format with fee and interest
+     */
     @Override
     public String interestPreview() {
         DecimalFormat decimalFormat = new DecimalFormat("##,###,###,###,###.##");
@@ -122,6 +183,9 @@ public class CollegeCheckingAccount extends Account {
                 super.rounder(this.monthlyInterest());
     }
 
+    /**
+     * Updates the balance with the monthly interest
+     */
     @Override
     public void setMonthlyInterest() {
         super.balance += this.monthlyInterest();

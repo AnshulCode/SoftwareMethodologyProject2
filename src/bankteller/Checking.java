@@ -23,11 +23,13 @@ public class Checking extends Account {
     }
 
     @Override
+    public void open(double amount) {
+        super.open(amount);
+    }
+
+    @Override
     public boolean isSufficentFunds(double amount) {
-        if (super.balance - this.fee - amount <= 0) {
-            return false;
-        }
-        return true;
+        return super.isSufficentFunds(amount);
     }
 
     @Override
