@@ -1,7 +1,6 @@
 package bankteller;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
+
 
 /**
  * The type Account.
@@ -13,7 +12,7 @@ public abstract class Account {
      */
     protected Profile holder;
     /**
-     * The Closed.
+     * Is Closed?
      */
     protected boolean closed;
     /**
@@ -92,6 +91,9 @@ public abstract class Account {
 
         if (!compare.getType().equals(this.getType())) {
             return false;
+        }
+        if(compare.getType().contains("Checking") && this.getType().contains("Checking")){
+            return true;
         }
         if (!this.holder.equals(compare.getHolder())) {
             return false;

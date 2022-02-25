@@ -7,8 +7,9 @@ import java.text.DecimalFormat;
  * The type Checking.
  */
 public class Checking extends Account {
-    private double fee = 25;
-    private double rate = .001 / 12;
+    protected double fee;
+    protected double rate = .001/12;
+
     private final String TYPE = "Checking";
 
     /**
@@ -20,6 +21,8 @@ public class Checking extends Account {
     public Checking(Profile holder, double balance) {
         super.holder = holder;
         super.balance = balance;
+
+
     }
 
     @Override

@@ -15,6 +15,8 @@ public class CollegeCheckingAccount extends Account {
     private static final String NEWARK = "NEWARK";
     private static final String TYPE = "College Checking";
 
+
+
     private int location;
     private double rate = 0.0025 / 12;
 

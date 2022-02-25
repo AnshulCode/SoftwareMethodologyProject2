@@ -169,6 +169,12 @@ public class AccountDatabase {
         }
     }
 
+    public void updateAccounts(){
+        for (int i = 0; i < this.numAcct; i++){
+             this.accounts[i].setMonthlyInterest();
+        }
+    }
+
 
     /**
      * Print all accounts by account type.
