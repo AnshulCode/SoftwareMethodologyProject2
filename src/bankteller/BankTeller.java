@@ -4,15 +4,29 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 /**
+ * The type Bank teller.
+ *
  * @author Alexander Reyes, Anshul P
  */
 public class BankTeller {
 
+    /**
+     * The Scan.
+     */
     public Scanner scan = new Scanner(System.in);
+    /**
+     * The Input.
+     */
     public String input = "";
+    /**
+     * The Max len of bank cmd.
+     */
     public int maxLenOfBankCmd = 6;
 
 
+    /**
+     * Run.
+     */
     public void run() {
         /*
         System.out.println("Bank Teller is running");
@@ -29,7 +43,7 @@ public class BankTeller {
 
         System.out.print("Bank Teller is terminated.");
         */
-        String input = " O MM  April March 1/15/1987 7000 W MM  April March 1/15/1987 2000 PT PI";
+        String input = " O MM  April March 1/15/1987 7000 W MM  April March 1/15/1987 -100 PT PI";
         input = input.trim();
         input = this.formatInput(input);
         AccountDatabase db = new AccountDatabase();
@@ -42,6 +56,12 @@ public class BankTeller {
 
     }
 
+    /**
+     * Format input string.
+     *
+     * @param input the input
+     * @return the string
+     */
     public String formatInput(String input) {
         String formattedInput = "";
         String[] tokens = input.split(" ");
@@ -72,21 +92,44 @@ public class BankTeller {
 
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         BankTeller b = new BankTeller();
         b.run();
     }
 
+    /**
+     * Is print cmd boolean.
+     *
+     * @param token the token
+     * @return the boolean
+     */
     public boolean isPrintCmd(String token) {
         return token.equals("P") || token.equals("PI") || token.equals("UB") ||
                 token.equals("Q") || token.equals("PT");
     }
 
+    /**
+     * Is bank cmd boolean.
+     *
+     * @param token the token
+     * @return the boolean
+     */
     public boolean isBankCmd(String token) {
         return token.equals("W") || token.equals("D") || token.equals("O") ||
                 token.equals("CL");
     }
 
+    /**
+     * Input processor.
+     *
+     * @param input the input
+     * @param db    the db
+     */
     public void inputProcessor(String input, AccountDatabase db) {
         StringTokenizer strTok = new StringTokenizer(input, " ");
 
@@ -116,6 +159,13 @@ public class BankTeller {
 
     }
 
+    /**
+     * Fix bank cmds.
+     *
+     * @param strTok the str tok
+     * @param token  the token
+     * @param db     the db
+     */
     public void fixBankCmds(StringTokenizer strTok, String token, AccountDatabase db) {
         StringTokenizer whatsLeft = strTok;
        // System.out.println("________________________________________________");
@@ -150,6 +200,17 @@ public class BankTeller {
         return;
     }
 
+    /**
+     * Process college checking account.
+     *
+     * @param fname      the fname
+     * @param lname      the lname
+     * @param dob        the dob
+     * @param amount     the amount
+     * @param location   the location
+     * @param opperation the opperation
+     * @return the account
+     */
     public Account processCollegeChecking(String fname, String lname, String dob,
                                           String amount, String location, String opperation) {
         try {
@@ -183,6 +244,16 @@ public class BankTeller {
         }
     }
 
+    /**
+     * Process money market account.
+     *
+     * @param fname      the fname
+     * @param lname      the lname
+     * @param dob        the dob
+     * @param amount     the amount
+     * @param opperation the opperation
+     * @return the account
+     */
     public Account processMoneyMarket(String fname, String lname, String dob,
                                       String amount, String opperation) {
         Date date = new Date(dob);
@@ -205,6 +276,17 @@ public class BankTeller {
         }
     }
 
+    /**
+     * Process savings account.
+     *
+     * @param fname      the fname
+     * @param lname      the lname
+     * @param dob        the dob
+     * @param loyalty    the loyalty
+     * @param amount     the amount
+     * @param opperation the opperation
+     * @return the account
+     */
     public Account processSavings(String fname, String lname, String dob,
                                   String loyalty, String amount, String opperation) {
         Date date = new Date(dob);
@@ -238,6 +320,16 @@ public class BankTeller {
         }
     }
 
+    /**
+     * Process checking account.
+     *
+     * @param fname      the fname
+     * @param lname      the lname
+     * @param dob        the dob
+     * @param amount     the amount
+     * @param opperation the opperation
+     * @return the account
+     */
     public Account processChecking(String fname, String lname, String dob,
                                    String amount, String opperation) {
         Date date = new Date(dob);
@@ -261,6 +353,12 @@ public class BankTeller {
         }
     }
 
+    /**
+     * Is opened.
+     *
+     * @param open the open
+     * @param db   the db
+     */
     public void isOpened(Account open, AccountDatabase db) {
         if (open != null) {
             if (db.publicFind(open) != null) {
@@ -293,23 +391,39 @@ public class BankTeller {
                     "account(type) is in the database.");
         }
     }
-    public void depositMessage(Account deposit, AccountDatabase db){
 
-        if(db.publicFind(deposit) == null){
-            System.out.println(deposit.getHolder().toString() + " " +
-                    deposit.getType() + " is not in the database.");
-            return;
+    /**
+     * Deposit message.
+     *
+     * @param deposit the deposit
+     * @param db      the db
+     */
+    public void depositMessage(Account deposit, AccountDatabase db){
+        if(deposit != null){
+            if(db.publicFind(deposit) == null){
+                System.out.println(deposit.getHolder().toString() + " " +
+                        deposit.getType() + " is not in the database.");
+                return;
+            }
+            if(db.publicFind(deposit).isClosed()){
+                System.out.println("Account is closed.");
+                return;
+            }
+            db.deposit(deposit);
+            System.out.println("Deposit - balance updated.");
         }
-        if(db.publicFind(deposit).isClosed()){
-            System.out.println("Account is closed.");
-            return;
-        }
-        db.deposit(deposit);
-        System.out.println("Deposit - balance updated.");
+
+
 
 
     }
 
+    /**
+     * Process open.
+     *
+     * @param cmd the cmd
+     * @param db  the db
+     */
     public void processOpen(String cmd, AccountDatabase db) {
         try {
             String[] options = cmd.split(" ");
@@ -344,22 +458,39 @@ public class BankTeller {
             System.out.println("Not a valid amount.");
         }
     }
+
+    /**
+     * Close message.
+     *
+     * @param close the close
+     * @param db    the db
+     */
     public void  closeMessage (Account close, AccountDatabase db){
-        if(db.publicFind(close)!= null){
-            Account found = db.publicFind(close);
-            if(found.isClosed()){
-                System.out.println("Account is closed already.");
-                return;
+        if(close != null){
+            if(db.publicFind(close)!= null){
+                Account found = db.publicFind(close);
+                if(found.isClosed()){
+                    System.out.println("Account is closed already.");
+                    return;
+                }
+                if(db.close(close)){
+                    System.out.println("Account is closed.");
+                }
+            }else{
+                System.out.println("Account does not exist.");
             }
-            if(db.close(close)){
-                System.out.println("Account is closed.");
+
             }
-        }else{
-            System.out.println("Account does not exist.");
-        }
+
 
     }
 
+    /**
+     * Process close.
+     *
+     * @param cmd the cmd
+     * @param db  the db
+     */
     public void processClose(String cmd, AccountDatabase db) {
         try {
             String[] options = cmd.split(" ");
@@ -392,6 +523,12 @@ public class BankTeller {
         }
     }
 
+    /**
+     * Process deposit.
+     *
+     * @param cmd the cmd
+     * @param db  the db
+     */
     public void processDeposit(String cmd, AccountDatabase db) {
         try {
             String[] options = cmd.split(" ");
@@ -428,26 +565,41 @@ public class BankTeller {
 
     }
 
+    /**
+     * Withdraw message.
+     *
+     * @param withdraw the withdraw
+     * @param db       the db
+     */
     public void withdrawMessage(Account withdraw,AccountDatabase db){
-        if(db.publicFind(withdraw) == null){
-            System.out.println(withdraw.getHolder().toString() + " " +
-                    withdraw.getType() + " is not in the database.");
-            return;
+        if(withdraw != null) {
+            if (db.publicFind(withdraw) == null) {
+                System.out.println(withdraw.getHolder().toString() + " " +
+                        withdraw.getType() + " is not in the database.");
+                return;
+            }
+
+            if (db.publicFind(withdraw).isClosed()) {
+                System.out.println("Account is closed.");
+                return;
+            }
+            double amount = withdraw.getBalance();
+            if (db.publicFind(withdraw).isSufficentFunds(amount)) {
+                System.out.println("Withdraw - insufficient fund.");
+                return;
+            }
+            db.withdraw(withdraw);
+            System.out.println("Withdraw - balance updated.");
         }
-        if(db.publicFind(withdraw).isClosed()){
-            System.out.println("Account is closed.");
-            return;
-        }
-        double amount = withdraw.getBalance();
-        if(db.publicFind(withdraw).isSufficentFunds(amount)){
-            System.out.println("Withdraw - insufficient fund.");
-            return;
-        }
-        db.withdraw(withdraw);
-        System.out.println("Withdraw - balance updated.");
 
     }
 
+    /**
+     * Process withdraw.
+     *
+     * @param cmd the cmd
+     * @param db  the db
+     */
     public void processWithdraw(String cmd, AccountDatabase db) {
         try {
             String[] options = cmd.split(" ");
@@ -486,6 +638,12 @@ public class BankTeller {
 
     }
 
+    /**
+     * Switch board.
+     *
+     * @param cmd the cmd
+     * @param db  the db
+     */
     public void switchBoard(String cmd, AccountDatabase db) {
         System.out.println("CMD given: "+cmd);
         if (cmd.startsWith("O")) {
@@ -500,6 +658,13 @@ public class BankTeller {
             this.processPrint(cmd,db);
         }
     }
+
+    /**
+     * Process print.
+     *
+     * @param cmd the cmd
+     * @param db  the db
+     */
     public void processPrint(String cmd, AccountDatabase db){
         if(db.isEmpty()){
             System.out.println("Account Database is empty!");

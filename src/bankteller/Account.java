@@ -1,7 +1,6 @@
 package bankteller;
 
 
-
 /**
  * The type Account.
  */
@@ -20,6 +19,11 @@ public abstract class Account {
      */
     protected double balance;
 
+    /**
+     * Open.
+     *
+     * @param amount the amount
+     */
     public void open(double amount){
         if(closed) {
 

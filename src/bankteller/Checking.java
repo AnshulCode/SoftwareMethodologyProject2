@@ -7,7 +7,13 @@ import java.text.DecimalFormat;
  * The type Checking.
  */
 public class Checking extends Account {
+    /**
+     * The Fee.
+     */
     protected double fee;
+    /**
+     * The Rate.
+     */
     protected double rate = .001/12;
 
     private final String TYPE = "Checking";

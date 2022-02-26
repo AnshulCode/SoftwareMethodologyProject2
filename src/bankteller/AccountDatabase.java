@@ -30,6 +30,12 @@ public class AccountDatabase {
         }
         return -1;
     }
+
+    /**
+     * Is empty boolean.
+     *
+     * @return the boolean
+     */
     public boolean isEmpty() {
         return (this.numAcct == 0);
     }
@@ -104,8 +110,7 @@ public class AccountDatabase {
     /**
      * Deposit.
      *
-     * @param account the account you want to deposit from
-     * Does nothing if there is no account found or if the account is closed
+     * @param account the account you want to deposit from Does nothing if there is no account found or if the account is closed
      */
     public void deposit(Account account) {
         if (this.find(account) == -1) {
@@ -174,6 +179,9 @@ public class AccountDatabase {
         }
     }
 
+    /**
+     * Update accounts.
+     */
     public void updateAccounts(){
         for (int i = 0; i < this.numAcct; i++){
              this.accounts[i].setMonthlyInterest();
