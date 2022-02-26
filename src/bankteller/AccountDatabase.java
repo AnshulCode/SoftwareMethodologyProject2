@@ -21,7 +21,7 @@ public class AccountDatabase {
      * @return -1 if not found, index in Database if found
      */
     private int find(Account account) {
-        for (int i = 0; i < this.accounts.length; i++) {
+        for (int i = 0; i < this.numAcct; i++) {
             if (this.accounts[i] != null) {
                 if (this.accounts[i].equals(account)) {
                     return i;
@@ -29,6 +29,9 @@ public class AccountDatabase {
             }
         }
         return -1;
+    }
+    public boolean isEmpty() {
+        return (this.numAcct == 0);
     }
 
     /**
@@ -70,16 +73,18 @@ public class AccountDatabase {
     public boolean open(Account account) {
 
         if (this.find(account) != -1) {
-            if(accounts[this.find(account)].isClosed()){
-                accounts[this.find(account)].open(account.getBalance());
+            if(this.accounts[this.find(account)].isClosed()){
+                this.accounts[this.find(account)].open(account.getBalance());
                 return true;
             }
             return false;
+        }else{
+            this.grow();
+            this.accounts[this.numAcct] = account;
+            this.numAcct++;
+            return true;
         }
-        this.grow();
-        this.accounts[this.numAcct] = account;
-        this.numAcct++;
-        return true;
+
     }
 
     /**

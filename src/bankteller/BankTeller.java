@@ -1,18 +1,16 @@
 package bankteller;
+
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
 /**
- *
  * @author Alexander Reyes, Anshul P
- *
  */
 public class BankTeller {
 
     public Scanner scan = new Scanner(System.in);
     public String input = "";
-    public int maxLenOfBankCmd = 7;
-
+    public int maxLenOfBankCmd = 6;
 
 
     public void run() {
@@ -31,112 +29,501 @@ public class BankTeller {
 
         System.out.print("Bank Teller is terminated.");
         */
-        String input = "o\n" +
-                "p\n" +
-                "q\n" +
-                "d\n" +
-                "w\n" +
-                "i\n" +
-                "pt\n" +
-                "pi\n" +
-                "ub\n" +
-                "a\n" +
-                "A\n" +
-                "c\n" +
-                "b\n" +
-                "B\n" +
-                "P " +
-                " PT" +
-                " PI\n" +
-                "UB\n O  CC   April March 1/15/1987 300 0 O  CC   April March 1/15/1987 300 0 O  CC   April March 1/15/1987 300 0  O  CC   Kate Lindsey 8/31/2001 450 2 D cb";
-        input = input.replaceAll("\n","  ");
-        this.inputProcessor(input);
+        String input = " O MM  April March 1/15/1987 7000 W MM  April March 1/15/1987 2000 PT PI";
+        input = input.trim();
+        input = this.formatInput(input);
+        AccountDatabase db = new AccountDatabase();
+        this.inputProcessor(input,db);
+
+        /*AccountDatabase db = new AccountDatabase();
+
+
+         */
+
     }
+
+    public String formatInput(String input) {
+        String formattedInput = "";
+        String[] tokens = input.split(" ");
+        int cCount = 0;
+        for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i].equals("C") && cCount == 0) {
+                tokens[i] = "CL";
+                cCount++;
+            } else if (tokens[i].equals("C") && cCount == 1) {
+
+                cCount++;
+            } else if (tokens[i].equals("C") && cCount == 2) {
+
+                tokens[i] = "CL";
+                cCount = 1;
+            } else {
+                cCount = 0;
+            }
+        }
+        String out = "";
+        for (String tok : tokens) {
+            if(!tok.equals(" ")){
+                out = out + " " + tok + " ";
+            }
+
+        }
+        return out;
+
+    }
+
     public static void main(String[] args) {
         BankTeller b = new BankTeller();
         b.run();
     }
+
     public boolean isPrintCmd(String token) {
         return token.equals("P") || token.equals("PI") || token.equals("UB") ||
-                token.equals("Q") ||token.equals("PT");
+                token.equals("Q") || token.equals("PT");
     }
+
     public boolean isBankCmd(String token) {
         return token.equals("W") || token.equals("D") || token.equals("O") ||
-                token.equals("C");
+                token.equals("CL");
     }
-    public void inputProcessor(String input){
-        StringTokenizer strTok = new StringTokenizer(input," ");
 
-        while(strTok.hasMoreTokens()){
+    public void inputProcessor(String input, AccountDatabase db) {
+        StringTokenizer strTok = new StringTokenizer(input, " ");
+
+        while (strTok.hasMoreTokens()) {
             String token = strTok.nextToken();
-            if(this.isPrintCmd(token)){
-                System.out.println(token);
-            }else if(isBankCmd(token)){
-                if(strTok.toString().isEmpty()){
+            //System.out.println("TOKEN FROM STRTOK: " + token);
+            if (this.isPrintCmd(token)) {
+                this.switchBoard(token, db);
+            } else if (isBankCmd(token)) {
+                if (strTok.toString().isEmpty()) {
                     break;
                 }
-                strTok = fixBankCmds(strTok,token);
+                if (token.equals("C")) {
+                    this.maxLenOfBankCmd = 5;
+                    fixBankCmds(strTok, token, db);
+                } else {
+                    this.maxLenOfBankCmd = 6;
+                    fixBankCmds(strTok, token, db);
+                }
+
             } else {
                 System.out.println("Invalid command!");
             }
 
         }
+
+
     }
 
-    public StringTokenizer fixBankCmds(StringTokenizer strTok,String token){
+    public void fixBankCmds(StringTokenizer strTok, String token, AccountDatabase db) {
         StringTokenizer whatsLeft = strTok;
-        int counter =0;
+       // System.out.println("________________________________________________");
+        int counter = 1;
         String cmd = token + " ";
+        boolean allowC = false;
         boolean ifTerminatedEarly = false;
         while (whatsLeft.hasMoreTokens()) {
             String tok = whatsLeft.nextToken();
-            if(this.isPrintCmd(tok)){
-                System.out.println(cmd);
+           // System.out.println("Token next :" + tok);
+            if (this.isPrintCmd(tok)) {
+                this.switchBoard(cmd, db);
+                this.switchBoard(tok,db);
                 ifTerminatedEarly = true;
                 break;
-            }
-            if(this.isBankCmd(tok) && !tok.equals("C")){
-                System.out.println(cmd);
+            } else if (this.isBankCmd(tok)) {
+                this.switchBoard(cmd, db);
                 cmd = tok + " ";
                 counter = 1;
-            }else if(counter < this.maxLenOfBankCmd){
-                cmd = cmd+tok+ " ";
+            } else if (counter < this.maxLenOfBankCmd) {
+                cmd = cmd + tok + " ";
                 counter++;
-            }else{
+            } else {
                 break;
             }
+            strTok = whatsLeft;
+
         }
-        if(!ifTerminatedEarly){
-            System.out.println(cmd);
+        if (!ifTerminatedEarly) {
+            this.switchBoard(cmd, db);
         }
-        return whatsLeft;
+        return;
     }
 
-    public void processOpen(String cmd, AccountDatabase db){
+    public Account processCollegeChecking(String fname, String lname, String dob,
+                                          String amount, String location, String opperation) {
+        try {
+            int loc = Integer.parseInt(location);
+            if (!(loc == 1 || loc == 0 || loc == 2)) {
+                System.out.println("Invalid campus code.");
+                return null;
+            }
+            Date date = new Date(dob);
+            if (!date.isValid()) {
+                System.out.println("Invalid date of birth.");
+                return null;
+            }
+            Profile pro = new Profile(fname, lname, dob);
+            try {
+                double money = Double.parseDouble(amount);
+                if (money <= 0) {
+                    System.out.println(opperation + " " + "cannot be 0 or negative.");
+                    return null;
+                }
+                Account returnVal = new CollegeCheckingAccount(pro, money, loc);
+                return returnVal;
+            } catch (NumberFormatException e) {
+                System.out.println("Not a valid amount.");
+                return null;
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid campus code.");
+            return null;
+        }
+    }
+
+    public Account processMoneyMarket(String fname, String lname, String dob,
+                                      String amount, String opperation) {
+        Date date = new Date(dob);
+        if (!date.isValid()) {
+            System.out.println("Invalid date of birth.");
+            return null;
+        }
+        Profile pro = new Profile(fname, lname, dob);
+        try {
+            double money = Double.parseDouble(amount);
+            if (money <= 0) {
+                System.out.println(opperation + " " + "cannot be 0 or negative.");
+                return null;
+            }
+            Account returnVal = new MoneyMarketAccount(pro, money);
+            return returnVal;
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid amount.");
+            return null;
+        }
+    }
+
+    public Account processSavings(String fname, String lname, String dob,
+                                  String loyalty, String amount, String opperation) {
+        Date date = new Date(dob);
+        if (!date.isValid()) {
+            System.out.println("Invalid date of birth.");
+            return null;
+        }
+        Profile pro = new Profile(fname, lname, dob);
+        try {
+            int isLoyal = Integer.parseInt(loyalty);
+            if (isLoyal != 0 || isLoyal != 1) {
+                System.out.println("invalid loyalty code");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid loyalty +code.");
+            return null;
+        }
+        try {
+            System.out.println("Money in savings: " + amount);
+            double money = Double.parseDouble(amount);
+
+            if (money <= 0) {
+                System.out.println(opperation + " " + "cannot be 0 or negative.");
+                return null;
+            }
+            Account returnVal = new Savings(pro, money, Integer.parseInt(loyalty));
+            return returnVal;
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid amount.");
+            return null;
+        }
+    }
+
+    public Account processChecking(String fname, String lname, String dob,
+                                   String amount, String opperation) {
+        Date date = new Date(dob);
+        if (!date.isValid()) {
+            System.out.println("Invalid date of birth.");
+            return null;
+        }
+        Profile pro = new Profile(fname, lname, dob);
+        try {
+            double money = Double.parseDouble(amount);
+
+            if (money <= 0) {
+                System.out.println(opperation + " " + "cannot be 0 or negative.");
+                return null;
+            }
+            Account returnVal = new Checking(pro, money);
+            return returnVal;
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid amount.");
+            return null;
+        }
+    }
+
+    public void isOpened(Account open, AccountDatabase db) {
+        if (open != null) {
+            if (db.publicFind(open) != null) {
+                Account found = db.publicFind(open);
+                if(open.getType().equals("Money Market Savings")){
+                    if(open.getBalance() < 2500.00){
+                        System.out.println("Minimum of $2500 to open a MoneyMarket account.");
+                        return;
+                    }
+                }
+                if (db.open(open)) {
+                    System.out.println("Account reopened.");
+                    return;
+                }
+
+
+            }
+            if(open.getType().equals("Money Market Savings")){
+                if(open.getBalance() < 2500.00){
+                    System.out.println("Minimum of $2500 to open a MoneyMarket account.");
+                    return;
+                }
+            }
+            if(db.open(open)){
+                System.out.println("Account opened.");
+                return;
+            }
+
+            System.out.println(open.getHolder().toString() + " " + "same " +
+                    "account(type) is in the database.");
+        }
+    }
+    public void depositMessage(Account deposit, AccountDatabase db){
+
+        if(db.publicFind(deposit) == null){
+            System.out.println(deposit.getHolder().toString() + " " +
+                    deposit.getType() + " is not in the database.");
+            return;
+        }
+        if(db.publicFind(deposit).isClosed()){
+            System.out.println("Account is closed.");
+            return;
+        }
+        db.deposit(deposit);
+        System.out.println("Deposit - balance updated.");
+
 
     }
-    public void processClose(String cmd,AccountDatabase db){
+
+    public void processOpen(String cmd, AccountDatabase db) {
+        try {
+            String[] options = cmd.split(" ");
+            String acctType = options[1];
+            String acctFname = options[2];
+            String acctLastName = options[3];
+            String acctDob = options[4];
+            String deposit = options[5];
+            if (acctType.equals("CC")) {
+                Account open = this.processCollegeChecking(acctFname, acctLastName, acctDob, deposit,
+                        options[6], "Initial Deposit");
+                this.isOpened(open, db);
+            } else if (acctType.equals("MM")) {
+                Account open = this.processMoneyMarket(acctFname, acctLastName, acctDob, deposit,
+                        "Initial Deposit");
+                this.isOpened(open, db);
+            } else if (acctType.equals("C")) {
+                Account open = this.processChecking(acctFname, acctLastName, acctDob, deposit,
+                        "Initial Deposit");
+                this.isOpened(open, db);
+            } else if (acctType.equals("S")) {
+                Account open = this.processSavings(acctFname, acctLastName, acctDob, options[6], deposit,
+                        "Initial Deposit");
+                this.isOpened(open, db);
+            } else {
+                System.out.println("Invalid command.");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Missing data for opening an account.");
+            return;
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid amount.");
+        }
+    }
+    public void  closeMessage (Account close, AccountDatabase db){
+        if(db.publicFind(close)!= null){
+            Account found = db.publicFind(close);
+            if(found.isClosed()){
+                System.out.println("Account is closed already.");
+                return;
+            }
+            if(db.close(close)){
+                System.out.println("Account is closed.");
+            }
+        }else{
+            System.out.println("Account does not exist.");
+        }
 
     }
-    public void processDeposit(String cmd,AccountDatabase db){
+
+    public void processClose(String cmd, AccountDatabase db) {
+        try {
+            String[] options = cmd.split(" ");
+            String acctType = options[1];
+            String acctFname = options[2];
+            String acctLastName = options[3];
+            String acctDob = options[4];
+            Account close = null;
+            if (acctType.equals("CC")) {
+                close = this.processCollegeChecking(acctFname, acctLastName, acctDob,
+                        "1", "1", "");
+                this.closeMessage(close,db);
+            } else if (acctType.equals("MM")) {
+                close = this.processMoneyMarket(acctFname, acctLastName, acctDob,"1", "");
+                this.closeMessage(close,db);
+            } else if (acctType.equals("C")) {
+                close = this.processChecking(acctFname, acctLastName, acctDob, "1", "");
+                this.closeMessage(close,db);
+            } else if (acctType.equals("S")) {
+                close = this.processSavings(acctFname, acctLastName, acctDob,
+                        "0", "1", "");
+                this.closeMessage(close,db);
+            } else {
+                System.out.println("Invalid command.");
+                return;
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Missing data for closing an account.");
+            return;
+        }
+    }
+
+    public void processDeposit(String cmd, AccountDatabase db) {
+        try {
+            String[] options = cmd.split(" ");
+            String acctType = options[1];
+            String acctFname = options[2];
+            String acctLastName = options[3];
+            String acctDob = options[4];
+            String deposit = options[5];
+            if (acctType.equals("CC")) {
+                Account depo = this.processCollegeChecking(acctFname, acctLastName, acctDob, deposit,
+                        "1", "Deposit - amount");
+                this.depositMessage(depo, db);
+            } else if (acctType.equals("MM")) {
+                Account depo = this.processMoneyMarket(acctFname, acctLastName, acctDob, deposit,
+                        "Deposit - amount");
+                this.depositMessage(depo, db);
+            } else if (acctType.equals("C")) {
+                Account depo = this.processChecking(acctFname, acctLastName, acctDob, deposit,
+                        "Deposit - amount");
+                this.depositMessage(depo, db);
+            } else if (acctType.equals("S")) {
+                Account depo = this.processSavings(acctFname, acctLastName, acctDob, options[6], deposit,
+                        "Deposit - amount");
+                this.depositMessage(depo, db);
+            } else {
+                System.out.println("Invalid command.");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Missing data for depositing into account.");
+            return;
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid amount.");
+        }
 
     }
-    public void processWithdraw(String cmd,AccountDatabase db){
+
+    public void withdrawMessage(Account withdraw,AccountDatabase db){
+        if(db.publicFind(withdraw) == null){
+            System.out.println(withdraw.getHolder().toString() + " " +
+                    withdraw.getType() + " is not in the database.");
+            return;
+        }
+        if(db.publicFind(withdraw).isClosed()){
+            System.out.println("Account is closed.");
+            return;
+        }
+        double amount = withdraw.getBalance();
+        if(db.publicFind(withdraw).isSufficentFunds(amount)){
+            System.out.println("Withdraw - insufficient fund.");
+            return;
+        }
+        db.withdraw(withdraw);
+        System.out.println("Withdraw - balance updated.");
 
     }
+
+    public void processWithdraw(String cmd, AccountDatabase db) {
+        try {
+            String[] options = cmd.split(" ");
+            String acctType = options[1];
+            String acctFname = options[2];
+            String acctLastName = options[3];
+            String acctDob = options[4];
+            String deposit = options[5];
+            if (acctType.equals("CC")) {
+                Account depo = this.processCollegeChecking(acctFname, acctLastName, acctDob, deposit,
+                        "1", "Withdraw - amount");
+                this.withdrawMessage(depo, db);
+            } else if (acctType.equals("MM")) {
+                Account depo = this.processMoneyMarket(acctFname, acctLastName, acctDob, deposit,
+                        "Withdraw - amount");
+                this.withdrawMessage(depo, db);
+            } else if (acctType.equals("C")) {
+                Account depo = this.processChecking(acctFname, acctLastName, acctDob, deposit,
+                        "Withdraw - amount");
+                this.withdrawMessage(depo, db);
+            } else if (acctType.equals("S")) {
+                Account depo = this.processSavings(acctFname, acctLastName, acctDob, options[6], deposit,
+                        "Withdraw - amount");
+                this.withdrawMessage(depo, db);
+            } else {
+                System.out.println("Invalid command.");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Missing data for withdrawing into account.");
+            return;
+        } catch (NumberFormatException e) {
+            System.out.println("Not a valid amount.");
+        }
+
+
+
+    }
+
     public void switchBoard(String cmd, AccountDatabase db) {
-        if(cmd.startsWith("O")){
-            this.processOpen(cmd,db);
+        System.out.println("CMD given: "+cmd);
+        if (cmd.startsWith("O")) {
+            this.processOpen(cmd, db);
+        } else if (cmd.startsWith("W")) {
+            this.processWithdraw(cmd, db);
+        } else if (cmd.startsWith("D")) {
+            this.processDeposit(cmd, db);
+        } else if (cmd.startsWith("CL")) {
+            this.processClose(cmd, db);
+        }else if(this.isPrintCmd(cmd)){
+            this.processPrint(cmd,db);
         }
-        if(cmd.startsWith("W")){
-            this.processWithdraw(cmd,db);
+    }
+    public void processPrint(String cmd, AccountDatabase db){
+        if(db.isEmpty()){
+            System.out.println("Account Database is empty!");
+        }else{
+            if(cmd.equals("P")){
+                System.out.println("*list of accounts in the database*");
+                db.print();
+                System.out.println("*end of list*");
+                return;
+            }
+            if(cmd.equals("PI")){
+                db.printFeeAndInterest();
+                return;
+            }
+            if(cmd.equals("PT")){
+                db.printByAccountType();
+                return;
+            }
+            if(cmd.equals("UB")){
+                System.out.println("*list of accounts with updated balance");
+                db.updateAccounts();
+                db.print();
+                System.out.println("*end of list.");
+            }
         }
-        if (cmd.startsWith("D")) {
-            this.processDeposit(cmd,db);
-        }
-        if (cmd.startsWith("C")) {
-            this.processClose(cmd,db);
-        }
-
     }
 }

@@ -80,7 +80,8 @@ public class Savings extends Account {
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
         String acct = this.toString();
-        return acct + "::fee $" + decimalFormat.format(this.fee()) + "::monthly interest $" + decimalFormat.format(this.monthlyInterest());
+        return acct + "::fee $" + decimalFormat.format(this.fee()) + "::monthly interest $" +
+                decimalFormat.format(this.monthlyInterest());
     }
 
     @Override
@@ -107,9 +108,9 @@ public class Savings extends Account {
 
         String rateRounded = deciFormat.format(super.rounder(super.balance));
         if (super.closed) {
-            return this.TYPE + "::" + super.holder.toString() + ":: Balance $" + rateRounded + "::CLOSED";
+            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded + "::CLOSED";
         }
-        return this.TYPE + "::" + super.holder.toString() + ":: Balance $" + rateRounded;
+        return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded;
     }
 
 
