@@ -21,38 +21,29 @@ public class BankTeller {
     /**
      * The Max len of bank cmd.
      */
-    public int maxLenOfBankCmd = 6;
+    public int maxLenOfBankCmd = 7;
 
 
     /**
      * Run.
      */
     public void run() {
-        /*
-        System.out.println("Bank Teller is running");
 
+        AccountDatabase db = new AccountDatabase();
+
+        System.out.println("Bank Teller is running");
+        Scanner scan = new Scanner(System.in);
+        String input  = "";
         while(!input.equals("Q")){
             input = scan.nextLine();
-            //System.out.println("command recived" + input);
-            this.inputProcessor(input);
+            input = input.trim();
 
-
-
-
+            this.inputProcessor(input,db);
+            //this.inputProcessor(input,db);
         }
 
         System.out.print("Bank Teller is terminated.");
-        */
-        String input = " O MM  April March 1/15/1987 7000 W MM  April March 1/15/1987 -100 PT PI";
-        input = input.trim();
-        input = this.formatInput(input);
-        AccountDatabase db = new AccountDatabase();
-        this.inputProcessor(input,db);
 
-        /*AccountDatabase db = new AccountDatabase();
-
-
-         */
 
     }
 
@@ -64,31 +55,10 @@ public class BankTeller {
      */
     public String formatInput(String input) {
         String formattedInput = "";
-        String[] tokens = input.split(" ");
+        StringTokenizer tokens = new StringTokenizer(input, " ");
         int cCount = 0;
-        for (int i = 0; i < tokens.length; i++) {
-            if (tokens[i].equals("C") && cCount == 0) {
-                tokens[i] = "CL";
-                cCount++;
-            } else if (tokens[i].equals("C") && cCount == 1) {
-
-                cCount++;
-            } else if (tokens[i].equals("C") && cCount == 2) {
-
-                tokens[i] = "CL";
-                cCount = 1;
-            } else {
-                cCount = 0;
-            }
-        }
-        String out = "";
-        for (String tok : tokens) {
-            if(!tok.equals(" ")){
-                out = out + " " + tok + " ";
-            }
-
-        }
-        return out;
+        boolean ignore = false;
+        return "";
 
     }
 
@@ -121,7 +91,7 @@ public class BankTeller {
      */
     public boolean isBankCmd(String token) {
         return token.equals("W") || token.equals("D") || token.equals("O") ||
-                token.equals("CL");
+                token.equals("C");
     }
 
     /**
@@ -135,20 +105,13 @@ public class BankTeller {
 
         while (strTok.hasMoreTokens()) {
             String token = strTok.nextToken();
-            //System.out.println("TOKEN FROM STRTOK: " + token);
             if (this.isPrintCmd(token)) {
                 this.switchBoard(token, db);
             } else if (isBankCmd(token)) {
                 if (strTok.toString().isEmpty()) {
                     break;
                 }
-                if (token.equals("C")) {
-                    this.maxLenOfBankCmd = 5;
-                    fixBankCmds(strTok, token, db);
-                } else {
-                    this.maxLenOfBankCmd = 6;
-                    fixBankCmds(strTok, token, db);
-                }
+                this.fixBankCmds(strTok,token,db);
 
             } else {
                 System.out.println("Invalid command!");
@@ -171,24 +134,37 @@ public class BankTeller {
        // System.out.println("________________________________________________");
         int counter = 1;
         String cmd = token + " ";
-        boolean allowC = false;
+        boolean allowC = true;
         boolean ifTerminatedEarly = false;
         while (whatsLeft.hasMoreTokens()) {
             String tok = whatsLeft.nextToken();
-           // System.out.println("Token next :" + tok);
             if (this.isPrintCmd(tok)) {
                 this.switchBoard(cmd, db);
                 this.switchBoard(tok,db);
                 ifTerminatedEarly = true;
                 break;
-            } else if (this.isBankCmd(tok)) {
-                this.switchBoard(cmd, db);
-                cmd = tok + " ";
-                counter = 1;
+            } else if (this.isBankCmd(tok) ) {
+                if(tok.equals("C") && allowC){
+                     cmd = cmd + tok + " ";
+                     counter++;
+                   allowC = false;
+                }else if(!tok.equals("C")){
+                    this.switchBoard(cmd, db);
+                    cmd = tok + " ";
+                    counter = 1;
+                    allowC = true;
+                }else if(tok.equals("C")){
+                    this.switchBoard(cmd, db);
+                    cmd = tok + " ";
+                    counter = 1;
+                    allowC = true;
+                }
             } else if (counter < this.maxLenOfBankCmd) {
                 cmd = cmd + tok + " ";
                 counter++;
-            } else {
+            } else if(tok.equals("C")){
+                break;
+            }else{
                 break;
             }
             strTok = whatsLeft;
@@ -297,7 +273,7 @@ public class BankTeller {
         Profile pro = new Profile(fname, lname, dob);
         try {
             int isLoyal = Integer.parseInt(loyalty);
-            if (isLoyal != 0 || isLoyal != 1) {
+            if (!(isLoyal == 0 || isLoyal == 1)) {
                 System.out.println("invalid loyalty code");
             }
         } catch (NumberFormatException e) {
@@ -360,35 +336,34 @@ public class BankTeller {
      * @param db   the db
      */
     public void isOpened(Account open, AccountDatabase db) {
+
         if (open != null) {
-            if (db.publicFind(open) != null) {
-                Account found = db.publicFind(open);
-                if(open.getType().equals("Money Market Savings")){
-                    if(open.getBalance() < 2500.00){
-                        System.out.println("Minimum of $2500 to open a MoneyMarket account.");
-                        return;
-                    }
-                }
-                if (db.open(open)) {
-                    System.out.println("Account reopened.");
-                    return;
-                }
-
-
-            }
             if(open.getType().equals("Money Market Savings")){
                 if(open.getBalance() < 2500.00){
                     System.out.println("Minimum of $2500 to open a MoneyMarket account.");
                     return;
                 }
             }
-            if(db.open(open)){
-                System.out.println("Account opened.");
-                return;
+            if (db.publicFind(open) != null) {
+                Account found = db.publicFind(open);
+                if (db.open(open)) {
+                    System.out.println("Account reopened.");
+                    return;
+                }else{
+                    System.out.println("Account already closed.");
+                }
+            }else{
+                if (db.open(open)) {
+                    System.out.println("Account opened.");
+                    return;
+                }
+                System.out.println(open.getHolder().toString() + " " + "same " +
+                        "account(type) is in the database.");
             }
 
-            System.out.println(open.getHolder().toString() + " " + "same " +
-                    "account(type) is in the database.");
+
+
+
         }
     }
 
@@ -645,18 +620,19 @@ public class BankTeller {
      * @param db  the db
      */
     public void switchBoard(String cmd, AccountDatabase db) {
-        System.out.println("CMD given: "+cmd);
+
         if (cmd.startsWith("O")) {
             this.processOpen(cmd, db);
         } else if (cmd.startsWith("W")) {
             this.processWithdraw(cmd, db);
         } else if (cmd.startsWith("D")) {
             this.processDeposit(cmd, db);
-        } else if (cmd.startsWith("CL")) {
+        } else if (cmd.startsWith("C")) {
             this.processClose(cmd, db);
-        }else if(this.isPrintCmd(cmd)){
+        }else if(this.isPrintCmd(cmd) ){
             this.processPrint(cmd,db);
         }
+
     }
 
     /**
@@ -689,6 +665,7 @@ public class BankTeller {
                 db.print();
                 System.out.println("*end of list.");
             }
+
         }
     }
 }
