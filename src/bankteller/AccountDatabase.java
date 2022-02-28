@@ -132,6 +132,7 @@ public class AccountDatabase {
      */
     public boolean withdraw(Account account) {
         if (this.find(account) == -1) {
+            System.out.println("Not Found");
             return false;
         }
         if (this.accounts[this.find(account)].isClosed()) {
@@ -140,8 +141,8 @@ public class AccountDatabase {
         if (!this.accounts[this.find(account)].isSufficentFunds(account.getBalance())) {
             return false;
         }
-        this.accounts[this.find(account)].withdraw(account.getBalance());
-
+        double amount = account.getBalance();
+        this.accounts[this.find(account)].withdraw(amount);
         return true;
     }
 
@@ -186,7 +187,7 @@ public class AccountDatabase {
      */
     public void updateAccounts(){
         for (int i = 0; i < this.numAcct; i++){
-             this.accounts[i].setMonthlyInterest();
+            this.accounts[i].setMonthlyInterest();
         }
     }
 

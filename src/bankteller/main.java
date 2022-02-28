@@ -18,13 +18,15 @@ public class main {
 
         Account account2 = new CollegeCheckingAccount(holder2, 100.0, 1);
         Account account5 = new Checking(holder2, 100.0);
-
+        Account withdraw = new Checking(holder2, 19.0);
 
         AccountDatabase test = new AccountDatabase();
 
         test.open(account5);
         test.open(account2);
-        test.printFeeAndInterest();
+        test.withdraw(withdraw);
+        test.print();
+
 
 
     }

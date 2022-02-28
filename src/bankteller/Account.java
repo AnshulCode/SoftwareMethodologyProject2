@@ -121,6 +121,7 @@ public abstract class Account {
             return;
         }
         this.balance -= amount;
+        System.out.println("Balence: "+Double.toString(this.balance));
         this.balance = this.rounder(this.balance);
     }
 
@@ -152,9 +153,9 @@ public abstract class Account {
      */
     public boolean isSufficentFunds(double amount){
         if (this.balance - this.fee() - amount <= 0) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
