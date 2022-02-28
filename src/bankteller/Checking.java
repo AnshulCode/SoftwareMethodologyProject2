@@ -18,6 +18,10 @@ public class Checking extends Account {
 
     private final String TYPE = "Checking";
 
+    public Checking() {
+
+    }
+
     /**
      * Instantiates a new Checking.
      *

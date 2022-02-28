@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 /**
  * The type College checking account.
  */
-public class CollegeCheckingAccount extends Account {
+public class CollegeCheckingAccount extends Checking {
 
 
     private static final String NEW_BRUNSWICK = "NEW_BRUNSWICK";
@@ -18,7 +18,7 @@ public class CollegeCheckingAccount extends Account {
 
 
     private int location;
-    private double rate = 0.0025 / 12;
+
 
 
     /**
@@ -33,6 +33,7 @@ public class CollegeCheckingAccount extends Account {
         super.holder = holder;
         super.balance = balance;
         this.location = location;
+        super.rate = 0.0025 / 12;
 
     }
 
@@ -162,11 +163,7 @@ public class CollegeCheckingAccount extends Account {
     @Override
     public double monthlyInterest() {
 
-
-        double monthlyInterest = this.balance * this.rate;
-
-
-        return super.rounder(monthlyInterest);
+       return super.monthlyInterest();
     }
 
     /**
@@ -178,11 +175,7 @@ public class CollegeCheckingAccount extends Account {
      */
     @Override
     public String interestPreview() {
-        DecimalFormat decimalFormat = new DecimalFormat("##,###,###,###,###.##");
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-        return this.toString() + "::fee $" + decimalFormat.format(this.fee()) + "::monthly interest $" +
-                super.rounder(this.monthlyInterest());
+        return super.interestPreview();
     }
 
     /**

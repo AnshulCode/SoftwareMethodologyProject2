@@ -6,10 +6,9 @@ import java.text.DecimalFormat;
 /**
  * The type Money market account.
  */
-public class MoneyMarketAccount extends Account {
-    private boolean isLoyal;
-    private double fee = 10;
-    private double rate = .095 / 12;
+public class MoneyMarketAccount extends Savings{
+
+
     private final String TYPE = "Money Market Savings";
 
     private boolean execessWithdrawl = false;
@@ -25,14 +24,14 @@ public class MoneyMarketAccount extends Account {
         super.holder = holder;
         super.balance = balance;
 
-        if (this.balance < 2500) {
-            this.isLoyal = false;
-            this.rate = .08 / 12;
+        if (super.balance < 2500) {
+            super.isLoyal = false;
+            super.rate = .08 / 12;
         } else {
-            this.isLoyal = true;
+            super.isLoyal = true;
         }
-
-        this.fee = this.fee();
+        super.rate = .095 / 12;
+        this.fee();
     }
 
     @Override
@@ -59,14 +58,15 @@ public class MoneyMarketAccount extends Account {
     public double fee() {
 
         if (super.balance >= 2500) {
-            this.fee = 0;
+            super.fee = 0;
         }
 
-        if (execessWithdrawl) {
+        if (this.execessWithdrawl) {
+            super.fee = 10;
             return 10;
         }
 
-        return this.fee;
+        return super.fee;
     }
 
     /**
@@ -74,12 +74,10 @@ public class MoneyMarketAccount extends Account {
      */
     private void updateLoyalty() {
         if (super.balance < 2500) {
-            this.isLoyal = false;
-            this.fee = .08 / 12;
-            this.rate = .08 / 12;
+            super.isLoyal = false;
+            super.rate = .08 / 12;
             return;
         }
-
         this.isLoyal = true;
     }
 
@@ -100,7 +98,7 @@ public class MoneyMarketAccount extends Account {
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
 
-        double monthlyInterest = this.balance * this.rate;
+
 
 
         String balenceRounded = decimalFormat.format(super.rounder(super.getBalance()));
@@ -108,12 +106,12 @@ public class MoneyMarketAccount extends Account {
         if (!super.closed) {
             if (this.isLoyal)
                 return this.TYPE + "::" + super.holder.toString() + "::Balance $" +
-                        balenceRounded + "::Loyal::withdrawl: " + Integer.toString(numWithdrawls);
+                        balenceRounded + "::Loyal::withdrawl: " + Integer.toString(this.numWithdrawls);
             return this.TYPE + "::" + super.holder.toString() + "::Balance $" +
                     balenceRounded + ":Loyal:withdrawl: " + Integer.toString(numWithdrawls);
         }
         return this.TYPE + "::" + super.holder.toString() + "::Balance $" + balenceRounded + "::CLOSED"
-                + "::withdrawl: " + Integer.toString(numWithdrawls);
+                + "::withdrawl: " + Integer.toString(this.numWithdrawls);
     }
 
 
@@ -139,34 +137,23 @@ public class MoneyMarketAccount extends Account {
 
         }
 
-        this.fee = this.fee();
+        super.fee = this.fee();
         this.updateLoyalty();
     }
 
     @Override
     public String interestPreview() {
-        DecimalFormat decimalFormat = new DecimalFormat("###,###,###.##");
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return this.toString() + "::fee $" + decimalFormat.format(this.fee()) + "::monthly interest $"
-                + decimalFormat.format(this.monthlyInterest());
+        return super.interestPreview();
     }
 
     @Override
     public void setMonthlyInterest() {
-        super.balance -= this.fee();
-        super.balance += this.monthlyInterest();
+      super.setMonthlyInterest();
     }
 
 
     @Override
     public double monthlyInterest() {
-
-
-        double monthlyInterest = this.balance * this.rate;
-
-
-        return (super.rounder(monthlyInterest));
+        return super.monthlyInterest();
     }
 }

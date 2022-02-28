@@ -8,11 +8,11 @@ import java.text.DecimalFormat;
  */
 public class Savings extends Account {
     private final String TYPE = "Savings";
-    private int fee = 6;
-    private double rate = .03 / 12;
+    protected double fee = 6;
+    protected double rate = .03 / 12;
 
 
-    private boolean isLoyal;
+    protected boolean isLoyal;
 
     /**
      * Instantiates a new Savings.
@@ -31,6 +31,9 @@ public class Savings extends Account {
             this.rate = 0.045 / 12;
         }
 
+
+    }
+    public Savings(){
 
     }
     @Override

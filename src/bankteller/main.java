@@ -16,15 +16,13 @@ public class main {
 
         Profile holder3 = new Profile("Aayush", "prasad", "06/18/2001");
 
-        Account account2 = new CollegeCheckingAccount(holder2, 100.0, 1);
-        Account account5 = new Checking(holder2, 100.0);
-        Account withdraw = new Checking(holder2, 19.0);
+        Account account2 = new MoneyMarketAccount(holder2, 2600);
+        Account account5 = new Savings(holder2, 100.0,1);
 
         AccountDatabase test = new AccountDatabase();
 
         test.open(account5);
         test.open(account2);
-        test.withdraw(withdraw);
         test.print();
 
 
