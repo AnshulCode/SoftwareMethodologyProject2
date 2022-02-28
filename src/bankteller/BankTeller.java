@@ -33,44 +33,16 @@ public class BankTeller {
 
         System.out.println("Bank Teller is running");
         Scanner scan = new Scanner(System.in);
-        String input  = "";
-        while(!input.equals("Q")){
+        String input = "";
+        while (!input.equals("Q")) {
             input = scan.nextLine();
             input = input.trim();
+            this.inputProcessor(input, db);
 
-            this.inputProcessor(input,db);
-            //this.inputProcessor(input,db);
         }
-
-        System.out.print("Bank Teller is terminated.");
-
-
     }
 
-    /**
-     * Format input string.
-     *
-     * @param input the input
-     * @return the string
-     */
-    public String formatInput(String input) {
-        String formattedInput = "";
-        StringTokenizer tokens = new StringTokenizer(input, " ");
-        int cCount = 0;
-        boolean ignore = false;
-        return "";
 
-    }
-
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     */
-    public static void main(String[] args) {
-        BankTeller b = new BankTeller();
-        b.run();
-    }
 
     /**
      * Is print cmd boolean.
@@ -111,7 +83,7 @@ public class BankTeller {
                 if (strTok.toString().isEmpty()) {
                     break;
                 }
-                this.fixBankCmds(strTok,token,db);
+                this.fixBankCmds(strTok, token, db);
 
             } else {
                 System.out.println("Invalid command!");
@@ -131,46 +103,45 @@ public class BankTeller {
      */
     public void fixBankCmds(StringTokenizer strTok, String token, AccountDatabase db) {
         StringTokenizer whatsLeft = strTok;
-       // System.out.println("________________________________________________");
         int counter = 1;
         String cmd = token + " ";
         boolean allowC = true;
         boolean ifTerminatedEarly = false;
         while (whatsLeft.hasMoreTokens()) {
-            String tok = whatsLeft.nextToken();
+            String tok = whatsLeft.nextToken().trim();
             if (this.isPrintCmd(tok)) {
                 this.switchBoard(cmd, db);
-                this.switchBoard(tok,db);
+                this.switchBoard(tok.trim(), db);
                 ifTerminatedEarly = true;
                 break;
-            } else if (this.isBankCmd(tok) ) {
-                if(tok.equals("C") && allowC){
-                     cmd = cmd + tok + " ";
-                     counter++;
-                   allowC = false;
-                }else if(!tok.equals("C")){
+            } else if (this.isBankCmd(tok)) {
+                if (tok.equals("C") && allowC) {
+                    cmd = cmd + tok.trim() + " ";
+                    counter++;
+                    allowC = false;
+                } else if (!tok.equals("C")) {
                     this.switchBoard(cmd, db);
-                    cmd = tok + " ";
+                    cmd = tok.trim() + " ";
                     counter = 1;
                     allowC = true;
-                }else if(tok.equals("C")){
+                } else if (tok.equals("C")) {
                     this.switchBoard(cmd, db);
-                    cmd = tok + " ";
+                    cmd = tok.trim() + " ";
                     counter = 1;
                     allowC = true;
                 }
-            } else if (counter < this.maxLenOfBankCmd) {
-                cmd = cmd + tok + " ";
+            } else if (counter < this.maxLenOfBankCmd && !tok.equals("")) {
+                cmd = cmd + tok.trim() + " ";
                 counter++;
-            } else if(tok.equals("C")){
+            } else if (tok.equals("C")) {
                 break;
-            }else{
+            } else {
                 break;
             }
             strTok = whatsLeft;
-
         }
         if (!ifTerminatedEarly) {
+            cmd = cmd.trim();
             this.switchBoard(cmd, db);
         }
         return;
@@ -196,7 +167,8 @@ public class BankTeller {
                 return null;
             }
             Date date = new Date(dob);
-            if (!date.isValid()) {
+            Date curr = new Date();
+            if (!date.isValid() || date.compareTo(curr) >= 0) {
                 System.out.println("Invalid date of birth.");
                 return null;
             }
@@ -233,7 +205,8 @@ public class BankTeller {
     public Account processMoneyMarket(String fname, String lname, String dob,
                                       String amount, String opperation) {
         Date date = new Date(dob);
-        if (!date.isValid()) {
+        Date curr = new Date();
+        if (!date.isValid() || date.compareTo(curr) >= 0) {
             System.out.println("Invalid date of birth.");
             return null;
         }
@@ -266,7 +239,8 @@ public class BankTeller {
     public Account processSavings(String fname, String lname, String dob,
                                   String loyalty, String amount, String opperation) {
         Date date = new Date(dob);
-        if (!date.isValid()) {
+        Date curr = new Date();
+        if (!date.isValid() || date.compareTo(curr) >= 0) {
             System.out.println("Invalid date of birth.");
             return null;
         }
@@ -309,7 +283,8 @@ public class BankTeller {
     public Account processChecking(String fname, String lname, String dob,
                                    String amount, String opperation) {
         Date date = new Date(dob);
-        if (!date.isValid()) {
+        Date curr = new Date();
+        if (!date.isValid() || date.compareTo(curr) >= 0) {
             System.out.println("Invalid date of birth.");
             return null;
         }
@@ -336,23 +311,26 @@ public class BankTeller {
      * @param db   the db
      */
     public void isOpened(Account open, AccountDatabase db) {
-
+        //System.out.println("Accout: holder" + open.getHolder().toString());
         if (open != null) {
-            if(open.getType().equals("Money Market Savings")){
-                if(open.getBalance() < 2500.00){
+            if (open.getType().equals("Money Market Savings")) {
+                if (open.getBalance() < 2500.00) {
                     System.out.println("Minimum of $2500 to open a MoneyMarket account.");
                     return;
                 }
             }
             if (db.publicFind(open) != null) {
                 Account found = db.publicFind(open);
+                System.out.println("Found account : " + found.toString());
                 if (db.open(open)) {
                     System.out.println("Account reopened.");
                     return;
-                }else{
-                    System.out.println("Account already closed.");
+                } else {
+                    System.out.println(open.getHolder().toString() + " " + "same " +
+                            "account(type) is in the database.");
+                    return;
                 }
-            }else{
+            } else {
                 if (db.open(open)) {
                     System.out.println("Account opened.");
                     return;
@@ -360,10 +338,6 @@ public class BankTeller {
                 System.out.println(open.getHolder().toString() + " " + "same " +
                         "account(type) is in the database.");
             }
-
-
-
-
         }
     }
 
@@ -373,24 +347,25 @@ public class BankTeller {
      * @param deposit the deposit
      * @param db      the db
      */
-    public void depositMessage(Account deposit, AccountDatabase db){
-        if(deposit != null){
-            if(db.publicFind(deposit) == null){
+    public void depositMessage(Account deposit, AccountDatabase db) {
+        if (deposit != null) {
+            if (db.publicFind(deposit) == null) {
                 System.out.println(deposit.getHolder().toString() + " " +
                         deposit.getType() + " is not in the database.");
                 return;
             }
-            if(db.publicFind(deposit).isClosed()){
+            if (!db.publicFind(deposit).getType().equals(deposit.getType())) {
+                System.out.println(deposit.getHolder().toString() + " " +
+                        deposit.getType() + " is not in the database.");
+                return;
+            }
+            if (db.publicFind(deposit).isClosed()) {
                 System.out.println("Account is closed.");
                 return;
             }
             db.deposit(deposit);
             System.out.println("Deposit - balance updated.");
         }
-
-
-
-
     }
 
     /**
@@ -440,24 +415,26 @@ public class BankTeller {
      * @param close the close
      * @param db    the db
      */
-    public void  closeMessage (Account close, AccountDatabase db){
-        if(close != null){
-            if(db.publicFind(close)!= null){
+    public void closeMessage(Account close, AccountDatabase db) {
+        if (close != null) {
+            if (db.publicFind(close) != null) {
                 Account found = db.publicFind(close);
-                if(found.isClosed()){
+                if (!db.publicFind(close).getType().equals(close.getType())) {
+                    System.out.println(close.getHolder().toString() + " " +
+                            close.getType() + " is not in the database.");
+                    return;
+                }
+                if (found.isClosed()) {
                     System.out.println("Account is closed already.");
                     return;
                 }
-                if(db.close(close)){
+                if (db.close(close)) {
                     System.out.println("Account is closed.");
                 }
-            }else{
+            } else {
                 System.out.println("Account does not exist.");
             }
-
-            }
-
-
+        }
     }
 
     /**
@@ -477,17 +454,17 @@ public class BankTeller {
             if (acctType.equals("CC")) {
                 close = this.processCollegeChecking(acctFname, acctLastName, acctDob,
                         "1", "1", "");
-                this.closeMessage(close,db);
+                this.closeMessage(close, db);
             } else if (acctType.equals("MM")) {
-                close = this.processMoneyMarket(acctFname, acctLastName, acctDob,"1", "");
-                this.closeMessage(close,db);
+                close = this.processMoneyMarket(acctFname, acctLastName, acctDob, "1", "");
+                this.closeMessage(close, db);
             } else if (acctType.equals("C")) {
                 close = this.processChecking(acctFname, acctLastName, acctDob, "1", "");
-                this.closeMessage(close,db);
+                this.closeMessage(close, db);
             } else if (acctType.equals("S")) {
                 close = this.processSavings(acctFname, acctLastName, acctDob,
                         "0", "1", "");
-                this.closeMessage(close,db);
+                this.closeMessage(close, db);
             } else {
                 System.out.println("Invalid command.");
                 return;
@@ -525,7 +502,7 @@ public class BankTeller {
                         "Deposit - amount");
                 this.depositMessage(depo, db);
             } else if (acctType.equals("S")) {
-                Account depo = this.processSavings(acctFname, acctLastName, acctDob, options[6], deposit,
+                Account depo = this.processSavings(acctFname, acctLastName, acctDob, "1", deposit,
                         "Deposit - amount");
                 this.depositMessage(depo, db);
             } else {
@@ -537,7 +514,6 @@ public class BankTeller {
         } catch (NumberFormatException e) {
             System.out.println("Not a valid amount.");
         }
-
     }
 
     /**
@@ -546,14 +522,18 @@ public class BankTeller {
      * @param withdraw the withdraw
      * @param db       the db
      */
-    public void withdrawMessage(Account withdraw,AccountDatabase db){
-        if(withdraw != null) {
+    public void withdrawMessage(Account withdraw, AccountDatabase db) {
+        if (withdraw != null) {
             if (db.publicFind(withdraw) == null) {
                 System.out.println(withdraw.getHolder().toString() + " " +
                         withdraw.getType() + " is not in the database.");
                 return;
             }
-
+            if (!db.publicFind(withdraw).getType().equals(withdraw.getType())) {
+                System.out.println(withdraw.getHolder().toString() + " " +
+                        withdraw.getType() + " is not in the database.");
+                return;
+            }
             if (db.publicFind(withdraw).isClosed()) {
                 System.out.println("Account is closed.");
                 return;
@@ -566,7 +546,6 @@ public class BankTeller {
             db.withdraw(withdraw);
             System.out.println("Withdraw - balance updated.");
         }
-
     }
 
     /**
@@ -596,7 +575,7 @@ public class BankTeller {
                         "Withdraw - amount");
                 this.withdrawMessage(depo, db);
             } else if (acctType.equals("S")) {
-                Account depo = this.processSavings(acctFname, acctLastName, acctDob, options[6], deposit,
+                Account depo = this.processSavings(acctFname, acctLastName, acctDob, "1", deposit,
                         "Withdraw - amount");
                 this.withdrawMessage(depo, db);
             } else {
@@ -608,9 +587,6 @@ public class BankTeller {
         } catch (NumberFormatException e) {
             System.out.println("Not a valid amount.");
         }
-
-
-
     }
 
     /**
@@ -620,7 +596,7 @@ public class BankTeller {
      * @param db  the db
      */
     public void switchBoard(String cmd, AccountDatabase db) {
-
+        System.out.println("CMD: " + cmd);
         if (cmd.startsWith("O")) {
             this.processOpen(cmd, db);
         } else if (cmd.startsWith("W")) {
@@ -629,11 +605,12 @@ public class BankTeller {
             this.processDeposit(cmd, db);
         } else if (cmd.startsWith("C")) {
             this.processClose(cmd, db);
-        }else if(this.isPrintCmd(cmd) ){
-            this.processPrint(cmd,db);
+        } else if (this.isPrintCmd(cmd)) {
+            this.processPrint(cmd, db);
         }
 
     }
+
 
     /**
      * Process print.
@@ -641,31 +618,46 @@ public class BankTeller {
      * @param cmd the cmd
      * @param db  the db
      */
-    public void processPrint(String cmd, AccountDatabase db){
-        if(db.isEmpty()){
+    public void processPrint(String cmd, AccountDatabase db) {
+        if (db.isEmpty() && (cmd.equals("PI") || cmd.equals("P") || cmd.equals("PT") || cmd.equals("UB"))) {
             System.out.println("Account Database is empty!");
-        }else{
-            if(cmd.equals("P")){
+        } else {
+            if (cmd.equals("P")) {
                 System.out.println("*list of accounts in the database*");
                 db.print();
                 System.out.println("*end of list*");
                 return;
             }
-            if(cmd.equals("PI")){
+            if (cmd.equals("PI")) {
                 db.printFeeAndInterest();
                 return;
             }
-            if(cmd.equals("PT")){
+            if (cmd.equals("PT")) {
                 db.printByAccountType();
                 return;
             }
-            if(cmd.equals("UB")){
+            if (cmd.equals("UB")) {
                 System.out.println("*list of accounts with updated balance");
                 db.updateAccounts();
                 db.print();
                 System.out.println("*end of list.");
             }
+            if (cmd.equals("Q")) {
+                System.out.print("Bank Teller is terminated.");
+                System.exit(0);
+            }
 
         }
     }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
+    public static void main(String[] args) {
+        BankTeller b = new BankTeller();
+        b.run();
+    }
+
 }

@@ -92,14 +92,15 @@ public abstract class Account {
     @Override
     public boolean equals(Object obj) {
         Account compare = (Account) obj;
-       // System.out.println("Coparing "+ compare.toString() + " "+ this.toString());
+        //System.out.println("Coparing "+ compare.toString() + " "+ this.toString());
+
+        if (!this.holder.equals(compare.getHolder())) {
+            return false;
+        }
         if(compare.getType().contains("Checking") && this.getType().contains("Checking")){
             return true;
         }
         if (!compare.getType().equals(this.getType())) {
-            return false;
-        }
-        if (!this.holder.equals(compare.getHolder())) {
             return false;
         }
         return true;

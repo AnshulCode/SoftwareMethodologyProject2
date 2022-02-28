@@ -107,10 +107,16 @@ public class Savings extends Account {
         deciFormat.setMinimumFractionDigits(2);
 
         String rateRounded = deciFormat.format(super.rounder(super.balance));
-        if (super.closed) {
-            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded + "::CLOSED";
+        if(!this.isLoyal) {
+            if (super.closed) {
+                return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded + "::CLOSED";
+            }
+            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded;
         }
-        return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded;
+        if (super.closed) {
+            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded+"::Loyal" + "::CLOSED";
+        }
+        return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded+"::Loyal";
     }
 
 

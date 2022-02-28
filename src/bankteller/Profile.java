@@ -29,11 +29,9 @@ public class Profile {
     @Override
     public boolean equals(Object o) {
         Profile compare = (Profile) o;
-        if (!this.fname.equals(compare.getfname()) || !this.lname.equals(compare.getLname())  ||
-                compare.getDob().compareTo(this.dob) != 0) {
-            return false;
-        }
-        return true;
+
+        return (this.fname.equalsIgnoreCase(compare.getfname()) && this.lname.equalsIgnoreCase(compare.getLname())  &&
+                compare.getDob().compareTo(this.dob) == 0);
     }
 
     /**

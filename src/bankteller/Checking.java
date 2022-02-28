@@ -75,7 +75,7 @@ public class Checking extends Account {
 
         String rateRounded = deciFormat.format(super.rounder(super.balance));
         if (super.closed) {
-            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded + "::CLOSED::";
+            return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded + "::CLOSED";
         }
         return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded;
     }

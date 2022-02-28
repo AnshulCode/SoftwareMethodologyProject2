@@ -79,7 +79,9 @@ public class AccountDatabase {
     public boolean open(Account account) {
 
         if (this.find(account) != -1) {
-            if(this.accounts[this.find(account)].isClosed()){
+            if(this.accounts[this.find(account)].isClosed() &&
+                    this.publicFind(account).getType().equals(account.getType())){
+
                 this.accounts[this.find(account)].open(account.getBalance());
                 return true;
             }
