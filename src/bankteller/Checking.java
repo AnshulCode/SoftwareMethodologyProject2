@@ -18,6 +18,9 @@ public class Checking extends Account {
 
     private final String TYPE = "Checking";
 
+    /**
+     * Instantiates a new Checking.
+     */
     public Checking() {
 
     }
@@ -35,21 +38,38 @@ public class Checking extends Account {
 
     }
 
+    /**
+     *
+     * @param amount the amount
+     */
     @Override
     public void open(double amount) {
         super.open(amount);
     }
 
+    /**
+     *
+     * @param amount the amount
+     * @return
+     */
     @Override
     public boolean isSufficentFunds(double amount) {
         return super.isSufficentFunds(amount);
     }
+
+    /**
+     *
+     */
 
     @Override
     public void close() {
         super.close();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public double fee() {
         if (super.balance >= 1000) {
@@ -60,16 +80,29 @@ public class Checking extends Account {
         return this.fee;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getType() {
         return TYPE;
     }
+
+    /**
+     *
+     * @return
+     */
 
     @Override
     public String toString() {
         return super.toString();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String printFormat() {
         DecimalFormat deciFormat = new DecimalFormat("###,###,###.##");
@@ -84,16 +117,30 @@ public class Checking extends Account {
         return this.TYPE + "::" + super.holder.toString() + "::Balance $" + rateRounded;
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
+
+    /**
+     *
+     * @param amount the amount
+     */
 
     @Override
     public void withdraw(double amount) {
         super.withdraw(amount);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String interestPreview() {
         DecimalFormat decimalFormat = new DecimalFormat("#,###,###,###.##");
@@ -105,6 +152,9 @@ public class Checking extends Account {
                 + decimalFormat.format(this.monthlyInterest());
     }
 
+    /**
+     *
+     */
     @Override
     public void setMonthlyInterest() {
         if (super.isClosed()) {
@@ -115,7 +165,10 @@ public class Checking extends Account {
         super.balance = super.rounder(super.balance);
     }
 
-
+    /**
+     *
+     * @return
+     */
     @Override
     public double monthlyInterest() {
         if (super.isClosed()) {

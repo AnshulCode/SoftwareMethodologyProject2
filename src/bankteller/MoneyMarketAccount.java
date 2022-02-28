@@ -34,6 +34,10 @@ public class MoneyMarketAccount extends Savings{
         this.fee();
     }
 
+    /**
+     *
+     * @param amount
+     */
     @Override
     public void open(double amount) {
         super.open(amount);
@@ -81,17 +85,29 @@ public class MoneyMarketAccount extends Savings{
         this.isLoyal = true;
     }
 
+    /**
+     *
+     * @param amount the amount
+     */
     @Override
     public void deposit(double amount) {
         super.deposit(amount);
         this.updateLoyalty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getType() {
         return TYPE;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String printFormat() {
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###.##");
@@ -114,17 +130,30 @@ public class MoneyMarketAccount extends Savings{
                 + "::withdrawl: " + Integer.toString(this.numWithdrawls);
     }
 
-
+    /**
+     *
+     * @param amount
+     * @return
+     */
     @Override
     public boolean isSufficentFunds(double amount) {
         return super.isSufficentFunds(amount);
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
+    /**
+     *
+     * @param amount
+     */
     @Override
     public void withdraw(double amount) {
         double prev_balence = super.getBalance();
@@ -141,17 +170,27 @@ public class MoneyMarketAccount extends Savings{
         this.updateLoyalty();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String interestPreview() {
         return super.interestPreview();
     }
 
+    /**
+     *
+     */
     @Override
     public void setMonthlyInterest() {
       super.setMonthlyInterest();
     }
 
-
+    /**
+     *
+     * @return
+     */
     @Override
     public double monthlyInterest() {
         return super.monthlyInterest();
